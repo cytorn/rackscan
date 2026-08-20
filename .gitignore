@@ -1,0 +1,18 @@
+# Frontend
+frontend/node_modules/
+frontend/.next/
+
+# Python
+backend/.venv/
+__pycache__/
+*.py[cod]
+backend/.pytest_cache/
+
+# Local data and environment
+backend/rackscan.db
+.env
+.env.local
+
+# Local visual QA artifacts
+.tmp-edge-*/
+ui-*.png
