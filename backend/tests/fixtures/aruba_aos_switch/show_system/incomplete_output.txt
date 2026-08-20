@@ -1,0 +1,2 @@
+System Description : Aruba 2930F 24G PoEP
+Serial Number : CN000000

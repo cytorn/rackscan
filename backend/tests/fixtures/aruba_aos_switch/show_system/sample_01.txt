@@ -1,0 +1,4 @@
+System Name : ACCESS-SW03
+System Description : Aruba 2930F 24G PoEP
+Serial Number : CN123456
+IP Address : 10.10.10.5

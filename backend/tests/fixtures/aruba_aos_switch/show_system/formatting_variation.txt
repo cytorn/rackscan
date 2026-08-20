@@ -1,0 +1,4 @@
+  System Name   :   ACCESS-SW05  
+System Description:Aruba 2930F 48G
+Serial Number: CN654321
+IP Address :10.10.10.7

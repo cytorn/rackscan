@@ -62,4 +62,10 @@ Installed plugins do not authorize architectural changes. Before implementation,
 
 - At task start, distinguish tools that are available from tools actually used.
 - Never claim that a plugin was used unless it was available and invoked.
+
+## Replit
+
+RackScan may be run in Replit as a secondary development and preview environment. Replit is not the architectural source of truth: the Git repository is authoritative.
+
+Use Replit only for clean-environment startup, preview, setup/documentation validation, deployment-oriented sanity checks, and optional review feedback. Do not redesign the architecture, migrate SQLite, add Replit-specific dependencies, or allow Replit Agent and Codex to modify the same feature concurrently. Any Replit-specific configuration must be minimal, reproducible from Git, and documented with its reason.
 - When a task materially benefits from plugins, report Stark, Context7, Webwright/Playwright, and Supabase usage or non-usage in the completion summary.

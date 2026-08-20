@@ -28,6 +28,12 @@ Exit criteria: a user can complete a demo site without file parsing or export.
 
 Exit criteria: sample CLI/CSV inputs reliably produce a reviewable change set.
 
+## Phase 2.5 — evidence architecture hardening
+
+Completed scope: persisted Site, field-level Observation history, explicit conflict resolution, persisted Connection topology, site-wide unresolved review queue, and ArubaOS-Switch parser fixtures. Existing Phase 2 device summaries are preserved and backfilled with `Legacy migration` provenance; their original per-field observed time was not available and remains explicitly unknown.
+
+Remaining before Phase 3: proposed connection intake/review is not yet exposed because the supported CSV and CLI inputs do not extract connection evidence. Phase 3 reporting must consume only resolved Device state and accepted Connection records.
+
 ## Phase 3 — documentation output
 
 - XLSX/CSV inventory export;

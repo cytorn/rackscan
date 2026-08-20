@@ -39,6 +39,10 @@ npm run dev
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The API docs are at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
+## Secondary preview environments
+
+The repository remains the portable source of truth; Replit may be used to run or preview an imported Git branch. SQLite stays local to the runtime. If the frontend and API use different origins, set `NEXT_PUBLIC_API_URL` to the API origin when building the frontend and set `RACKSCAN_CORS_ORIGINS` to a comma-separated allow-list including the frontend origin. No Replit-specific dependency or domain logic is required.
+
 ## Verify
 
 ```powershell
