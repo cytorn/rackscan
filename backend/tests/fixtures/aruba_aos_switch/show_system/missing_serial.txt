@@ -1,0 +1,3 @@
+System Name : ACCESS-SW04
+System Description : Aruba 2930F 24G PoEP
+IP Address : 10.10.10.6
