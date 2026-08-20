@@ -58,6 +58,19 @@ def test_device_creation_requires_unique_name_and_records_manual_observations() 
     assert duplicate.status_code == 409
 
 
+def test_manual_connection_is_persisted_and_returned_to_topology() -> None:
+    with TestClient(app) as client:
+        site = client.get("/api/sites/pj-office").json()
+        devices = {device["name"]: device["id"] for device in site["devices_list"]}
+        created = client.post("/api/sites/pj-office/connections", json={"device_a_id": devices["CORE-SW01"], "interface_a": "Port 10", "device_b_id": devices["AP-MEETING"], "interface_b": "eth0"})
+        connections = client.get("/api/sites/pj-office/connections").json()
+        topology = client.get("/api/sites/pj-office").json()["topology"]
+    assert created.status_code == 201
+    assert any(link["device_b_name"] == "AP-MEETING" for link in connections)
+    ap_node = next(node["id"] for node in topology["nodes"] if node["label"] == "AP-MEETING")
+    assert any(edge["target"] == ap_node for edge in topology["edges"])
+
+
 def test_pending_observation_accept_updates_resolved_device_and_preserves_queue_history() -> None:
     name = f"NEW-SWITCH-{uuid4().hex[:8]}".upper()
     with TestClient(app) as client:

@@ -122,6 +122,29 @@ class DeviceCreate(SQLModel):
     serial_number: str | None = Field(default=None, max_length=100)
 
 
+class ConnectionCreate(SQLModel):
+    device_a_id: int | None = None
+    interface_a: str | None = Field(default=None, max_length=80)
+    device_b_id: int
+    interface_b: str | None = Field(default=None, max_length=80)
+    relationship_type: str = Field(default="uplink", max_length=50)
+    observed_at: str | None = Field(default=None, max_length=64)
+
+
+class ConnectionRead(SQLModel):
+    id: int
+    device_a_id: int | None
+    device_a_name: str
+    interface_a: str | None
+    device_b_id: int
+    device_b_name: str
+    interface_b: str | None
+    relationship_type: str
+    source: str
+    confidence: int
+    observed_at: str
+
+
 class CsvImportRequest(SQLModel):
     filename: str = Field(min_length=1, max_length=160)
     csv_text: str = Field(min_length=1, max_length=250_000)
@@ -397,6 +420,26 @@ def create_device(payload: DeviceCreate, session: SessionDep) -> Device:
         value = getattr(device, field_name)
         if value: session.add(Observation(site_id=SITE_ID, device_id=device.id, field_name=field_name, observed_value=value, accepted_value_at_import=value, source="Manual entry", confidence=100, observed_at=now(), review_status="accepted"))
     session.commit(); return device
+
+
+@app.get("/api/sites/pj-office/connections", response_model=list[ConnectionRead])
+def read_connections(session: SessionDep) -> list[ConnectionRead]:
+    devices = {device.id: device for device in session.exec(select(Device).where(Device.site_id == SITE_ID))}
+    records = session.exec(select(Connection).where(Connection.site_id == SITE_ID, Connection.review_status == "accepted")).all()
+    return [ConnectionRead(id=record.id, device_a_id=record.device_a_id, device_a_name=devices[record.device_a_id].name if record.device_a_id in devices else "Internet", interface_a=record.interface_a, device_b_id=record.device_b_id, device_b_name=devices[record.device_b_id].name, interface_b=record.interface_b, relationship_type=record.relationship_type, source=record.source, confidence=record.confidence, observed_at=record.observed_at) for record in records if record.device_b_id in devices]
+
+
+@app.post("/api/sites/pj-office/connections", response_model=ConnectionRead, status_code=201)
+def create_connection(payload: ConnectionCreate, session: SessionDep) -> ConnectionRead:
+    if payload.device_a_id == payload.device_b_id:
+        raise HTTPException(status_code=422, detail="A connection needs two distinct endpoints.")
+    destination = session.get(Device, payload.device_b_id)
+    source = session.get(Device, payload.device_a_id) if payload.device_a_id else None
+    if not destination or destination.site_id != SITE_ID or (source and source.site_id != SITE_ID):
+        raise HTTPException(status_code=422, detail="Choose devices from this site.")
+    record = Connection(site_id=SITE_ID, device_a_id=source.id if source else None, interface_a=payload.interface_a or None, device_b_id=destination.id, interface_b=payload.interface_b or None, relationship_type=payload.relationship_type, source="Manual entry", confidence=100, observed_at=payload.observed_at or now())
+    session.add(record); session.commit(); session.refresh(record)
+    return ConnectionRead(id=record.id, device_a_id=record.device_a_id, device_a_name=source.name if source else "Internet", interface_a=record.interface_a, device_b_id=destination.id, device_b_name=destination.name, interface_b=record.interface_b, relationship_type=record.relationship_type, source=record.source, confidence=record.confidence, observed_at=record.observed_at)
 
 
 @app.post("/api/sites/pj-office/evidence/csv", response_model=CsvImportResponse, status_code=201)

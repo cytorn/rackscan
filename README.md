@@ -1,49 +1,44 @@
 # RackScan
 
-RackScan turns network site-survey evidence into reviewable network documentation. It preserves evidence and uncertainty instead of inventing missing facts.
+RackScan turns site-survey evidence into reviewable network documentation. It keeps source, confidence, time observed, unknown values, and conflicts visible instead of guessing.
 
-## Phase 1: local vertical slice
+## Start here
 
-The current slice provides a seeded Petaling Jaya office workspace with:
+### First time only
 
-- site-health overview and attention queue;
-- searchable, filterable device inventory;
-- evidence/confidence-aware device inspector;
-- simple logical topology preview;
-- manual device creation stored in local SQLite;
-- FastAPI tests and a responsive Next.js interface.
-
-## Phase 2: evidence ingestion
-
-The first ingestion slice accepts CSV inventory evidence through `POST /api/sites/pj-office/evidence/csv`. It stores the raw CSV and each source row as a proposal; it never overwrites the accepted inventory. Supported columns are `name` (required), `device_type`, `brand`, `model`, `ip_address`, and `serial_number`.
-
-Existing device names are flagged as `conflict`; new or duplicate-in-file names are marked for `review`. The Evidence workspace supports accepting a non-conflicting proposal into inventory or rejecting it; accepted devices retain the import source and confidence. Conflicts cannot overwrite accepted facts.
-
-The one supported CLI input is ArubaOS-Switch `show system`. It deterministically reads `System Name`, `System Description`, `Serial Number`, and `IP Address` into a reviewable proposal. Other platforms and commands remain unsupported.
-
-Automatic topology extraction, exports, authentication, and external services remain deferred.
-
-## Run locally
-
-Open two terminals from the repository root after restarting Codex/your terminal once:
+1. Install [Python 3.13+](https://www.python.org/downloads/) and [Node.js 20+](https://nodejs.org/).
+2. Open PowerShell in this project folder.
+3. Run:
 
 ```powershell
-cd backend
-.\.venv\Scripts\python -m uvicorn app.main:app --reload
+.\Setup-RackScan.ps1
 ```
+
+### Every time you want to use RackScan
 
 ```powershell
-cd frontend
-npm run dev
+.\Start-RackScan.ps1
 ```
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The API docs are at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+Two PowerShell windows open: one for the API and one for the web app. Keep them open while using RackScan, then open [http://127.0.0.1:3000](http://127.0.0.1:3000).
 
-## Secondary preview environments
+## What you can do
 
-The repository remains the portable source of truth; Replit may be used to run or preview an imported Git branch. SQLite stays local to the runtime. If the frontend and API use different origins, set `NEXT_PUBLIC_API_URL` to the API origin when building the frontend and set `RACKSCAN_CORS_ORIGINS` to a comma-separated allow-list including the frontend origin. No Replit-specific dependency or domain logic is required.
+- Review a seeded site workspace and evidence-backed topology.
+- Add devices and manually record observed network connections.
+- Import CSV inventory evidence with `name`, `device_type`, `brand`, `model`, `ip_address`, and `serial_number` columns.
+- Paste ArubaOS-Switch `show system` output.
+- Review, accept, reject, or explicitly resolve field-level conflicts.
 
-## Verify
+RackScan is local-first. It does not scan networks, connect to devices, monitor traffic, change configurations, or use a cloud database.
+
+## Troubleshooting
+
+- **“Not set up yet”** — run `./Setup-RackScan.ps1` once.
+- **Port already in use** — close older RackScan PowerShell windows, then launch again.
+- **Cannot reach the API** — wait for the API window to show that Uvicorn is running, then refresh the browser.
+
+## Developer checks
 
 ```powershell
 cd backend
@@ -54,10 +49,6 @@ npm run lint
 npm run build
 ```
 
-## Dependencies
+## Secondary preview environments
 
-- Next.js/React: responsive web interface and local development tooling.
-- FastAPI/SQLModel: typed local API and SQLite persistence, kept separate from presentation logic.
-- pytest/httpx: API behaviour checks.
-
-No LLM, paid API, cloud service, plugin runtime, scanner, or network-device connection is used in Phase 1.
+Git remains the source of truth. Replit can run an imported branch as a secondary preview environment, but it does not change RackScan’s local-first architecture. If the frontend and API use different origins, set `NEXT_PUBLIC_API_URL` and `RACKSCAN_CORS_ORIGINS` for those origins.

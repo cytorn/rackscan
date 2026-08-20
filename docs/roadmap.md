@@ -19,6 +19,8 @@ Build one end-to-end happy path with seeded sample data:
 
 Exit criteria: a user can complete a demo site without file parsing or export.
 
+Status: complete. The local workspace supports manual device and persisted manual-connection evidence, inventory inspection, evidence-backed topology, and local persistence.
+
 ## Phase 2 — evidence ingestion
 
 - CSV inventory import;
@@ -27,6 +29,8 @@ Exit criteria: a user can complete a demo site without file parsing or export.
 - review queue for proposed facts, unknowns, and conflicts.
 
 Exit criteria: sample CLI/CSV inputs reliably produce a reviewable change set.
+
+Status: complete for the intentionally supported inputs: CSV inventory and ArubaOS-Switch `show system`. Both retain raw evidence and create a site-wide, reviewable field-observation queue.
 
 ## Phase 2.5 — evidence architecture hardening
 
